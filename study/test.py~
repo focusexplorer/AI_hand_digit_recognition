@@ -15,7 +15,7 @@ print type(img)
 print img[:,:,0];
 #plt.show()
 
-sys.exit();
+#sys.exit();
 x=np.linspace(0,5,100)
 y=2*np.sin(x)+0.3*x**2;
 plt.plot(x,y,'.');
