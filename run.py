@@ -12,6 +12,18 @@ def relu(x):
 		return x;
 	else:
 		return 0.1*x;
+		
+		
+def train(p,w1,w2,real_value):
+	o1=np.dot(w1,p);
+	o2=np.dot(w2,o1);
+	rv=np.zeros((10,1),dtype=np.double);
+	rv[real_value-1,0]=1;
+	e2=o2-rv;
+	e1=np.dot(np.transpose(w2).(o2-rv));
+	
+def cal_forward(indata,w):
+	out_put=inddata*w;
 def cal_forward(indata,w,b):
 	n=w.shape[0];
 #	print w.shape
