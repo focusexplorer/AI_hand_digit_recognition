@@ -9,4 +9,4 @@ wget http://deeplearning.net/data/minist/mnist.pkl.gz}
 
 第一步，运行python unpack_image.py解压资源。
 
-第二目，运行python sigmoid.py用sigmoid激活函数进行手写字体识别。
+第二步，运行python sigmoid.py用sigmoid激活函数进行手写字体识别。
