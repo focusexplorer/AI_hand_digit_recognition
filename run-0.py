@@ -7,21 +7,136 @@ import glob
 import re
 
 #define base type and functions
+STUDY_RATE=1;
+
 def relu(x):
 	if x>=0:
 		return x;
 	else:
 		return 0.1*x;
-		
-		
-def train(p,w1,w2,real_value):
-	o1=np.dot(w1,p);
-	o2=np.dot(w2,o1);
-	rv=np.zeros((10,1),dtype=np.double);
-	rv[real_value-1,0]=1;
-	e2=o2-rv;
-	e1=np.dot(np.transpose(w2).(o2-rv));
+
+def drelu(x):
+	if x>=0:
+		return 1;
+	else:
+		return 0.1;
+
+def relu_all(ax):
+	for i in range(ax.shape[0]):
+		for j in range(ax.shape[1]):
+			ax[i,j]=relu(ax[i,j]);
+	return ax;
+def sigmoid(x):
+    return 1 / (1 + np.e ** -x);
+def dsigmoid(x):
+	return sigmoid(x)*(1-sigmoid(x));
+def sigmoid_all(ax):
+	for i in range(ax.shape[0]):
+		for j in range(ax.shape[1]):
+			ax[i,j]=sigmoid(ax[i,j]);
+	return ax;
+
+def active(x):
+	return sigmoid(x);
+	return relu(x);
+def dactive(x):
+	return dsigmoid(x);
+	return drelu(x);
+def active_all(x):
+	return sigmoid_all(x);
+	return relu_all(x);
+
+def back_level(de_do,o,on,a,b):
+#	print 'de_do=',de_do.T;
+#	print 'o=',o.T;
+#	print 'b=',b.T;
+	ONCE=0;
+	I=0;
+	J=0;
+	de_da=np.zeros(a.shape,dtype=np.double);
+	for i in range(0,a.shape[0]):
+		for j in range(0,a.shape[1]):
+			de_da[i,j]=de_do[i]*dactive(on[i])*b[j];
+#			print 'b[j]=',b[j];
+#			print 'de_do[i]=',de_do[i]
+#			print 'de_da[i,j]=',de_da[i,j]
+			if de_da[i,j]>0.1 and ONCE==0:
+				print '=>',i,j,de_da[i,j];
+				I=i;
+				J=j;
+				ONCE=1;
+
+			if de_da[i,j]>0.1:
+				de_da[i,j]=0.1;
+#				print 'restrict';
+			if de_da[i,j]<-0.1:
+				de_da[i,j]=-0.1;
+#				print 'restrict';
+#	a=a-STUDY_RATE*de_da;//this will lead w not changed out side;
+	a-=STUDY_RATE*de_da;
+	print 'de_da=',de_da
+	print de_da[I,J]
+	print 'a=',a
+	print 'STUDY_RATE=',STUDY_RATE
+#	a[5,5]=50;#--------------------------------------------------------------------
 	
+	de_db=np.zeros(b.shape,dtype=np.double); 
+	for j in range(0,a.shape[1]):
+		for i in range(0,a.shape[0]):
+			de_db[j]+=de_do[i]*dactive(on[i])*a[i,j];
+	return de_db;	
+	
+def train(p,w1,w2,rv):
+	on1=np.dot(w1,p);
+	o1=active_all(on1);
+	on2=np.dot(w2,o1);
+	o2=active_all(on2);
+#	print 'o1=',o1.T
+#	print 'o2=',o2.T
+	de_do2=o2-rv;	
+	de_do1=back_level(de_do2,o2,on2,w2,o1);
+	de_dp=back_level(de_do1,o1,on1,w1,p);
+#	print 'w1=',w1,'w2=',w2
+	de=de_do2*de_do2;
+	print 'e==================================================================',de.sum();
+	
+N=784;
+w1=np.random.random((N,N));
+w2=np.random.random((10,N));
+print 'w1=',w1,'w2=',w2
+seq=0;
+for filename in glob.glob(r'mnist\train\*.png'):
+	seq=seq+1
+#	if seq>2:
+#		break;
+	print 'seq=',seq
+	print filename
+	img=np.array(Image.open(filename))
+	#print img.shape
+	p=img[:,:,0];
+	p=p.reshape(p.size,1)/255.0;
+	#break;
+	#print 'p=',p;
+	real_value=int(re.split(r"[_.]",filename)[1]);
+	rv=np.zeros((10,1),dtype=np.double);
+	rv[real_value-1,0]=1; 
+	#print 'rv=',rv;
+	#break;
+	for i in range(10):
+		print '-----------------',i
+		print 'w1.std()=',w1.std()
+		print 'w2.std()=',w2.std()
+		train(p,w1,w2,rv);
+#		print 'w1[5,5]=',w1[5,5]
+#	break;
+
+sys.exit();
+
+
+
+
+
+
 def cal_forward(indata,w):
 	out_put=inddata*w;
 def cal_forward(indata,w,b):

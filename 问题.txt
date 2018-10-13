@@ -1,2 +1,0 @@
-反向传播时，ReLU导数是按x符号来判断还是按y的符号来判断？
-https://blog.csdn.net/happyer88/article/details/46772347
